@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Full Screen Deer Dodge</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-image: url('image.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            cursor: none;
+        }
+        
+        #deer {
+            position: absolute;
+            font-size: 40px;
+            z-index: 100;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+        
+        .obstacle {
+            position: absolute;
+            font-size: 30px;
+            z-index: 10;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+        
+        #scoreContainer {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #scoreCircle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        #scoreCircle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('imagen.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.6;
+        }
+        
+        #scoreValue {
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .score-animation {
+            animation: scoreChange 0.5s ease-in-out;
+        }
+        
+        .circle-animation {
+            animation: circlePulse 0.5s ease-in-out;
+        }
+        
+        @keyframes scoreChange {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes circlePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 18px;
+            margin: 15px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        #ground {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background-image: url('suelo.png');
+            background-size: cover;
+            background-position: top center;
+            z-index: 5;
+        }
+        
+        /* Estilos para la pregunta */
+        #questionContainer {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            max-width: 80%;
+        }
+        
+        #questionText {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .answer-btn {
+            position: absolute;
+            background-color: rgba(52, 152, 219, 0.8);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .answer-btn:hover {
+            background-color: rgba(41, 128, 185, 0.9);
+            transform: scale(1.05);
+        }
+        
+        .deer-over-btn {
+            border: 3px solid #f1c40f;
+            box-shadow: 0 0 15px #f1c40f;
+        }
+        /* ESTILOS ACTUALIZADOS PARA PREGUNTAS Y RESPUESTAS */
+#questionContainer {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 1000;
+    display: none;
+    max-width: 80%;
+    width: max-content; /* Ajuste para que no sea demasiado ancho */
+}
+
+/* Contenedor para los botones de respuesta */
+#answersContainer {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Espacio entre botones */
+    margin-top: 20px;
+}
+
+/* Estilo para los botones de respuesta (ahora dentro del contenedor) */
+.answer-btn {
+    background-color: rgba(52, 152, 219, 0.8);
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s;
+    z-index: 1000;
+    display: none;
+    position: relative; /* Cambiado de absolute a relative */
+    width: 180px; /* Ancho fijo para consistencia */
+}
+
+/* Mantener los otros estilos existentes */
+.answer-btn:hover {
+    background-color: rgba(41, 128, 185, 0.9);
+    transform: scale(1.05);
+}
+
+.deer-over-btn {
+    border: 3px solid #f1c40f;
+    box-shadow: 0 0 15px #f1c40f;
+}
+    </style>
+</head>
+<body>
+    <div id="scoreContainer">
+        <div id="scoreCircle">
+            <div id="scoreValue">0</div>
+        </div>
+    </div>
+    <div id="deer">🦌</div>
+    <div id="ground"></div>
+    
+    <!-- Contenedor de pregunta -->
+<!-- Modifica esta parte -->
+<div id="questionContainer">
+    <div id="questionText"></div>
+    <div id="answersContainer">
+        <button id="answerBtn1" class="answer-btn"></button>
+        <button id="answerBtn2" class="answer-btn"></button>
+    </div>
+</div>
+    
+    <!-- Botones de respuesta (posicionados dinámicamente) -->
+    <button id="answerBtn1" class="answer-btn"></button>
+    <button id="answerBtn2" class="answer-btn"></button>
+    
+    <div id="gameOver">
+        <h2>Fin del juego!</h2>
+        <p id="finalScore">Tu puntaje: 0</p>
+        <button onclick="resetGame()">Reintentar</button>
+    </div>
+
+    <script>
+        // Elementos del juego
+        const deer = document.getElementById('deer');
+        const scoreElement = document.getElementById('scoreValue');
+        const scoreCircle = document.getElementById('scoreCircle');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const ground = document.getElementById('ground');
+        const questionContainer = document.getElementById('questionContainer');
+        const questionText = document.getElementById('questionText');
+        const answerBtn1 = document.getElementById('answerBtn1');
+        const answerBtn2 = document.getElementById('answerBtn2');
+        
+        // Variables del juego
+        let score = 0;
+        let gameRunning = true;
+        let obstacleSpeed = 2;
+        let obstacleSpawnRate = 1000;
+        let obstacles = [];
+        let deerX = window.innerWidth / 2;
+        let deerY = window.innerHeight - 60;
+        const deerSize = 40;
+        let questionActive = false;
+        let correctAnswer = null;
+        let questionTimer;
+        
+        // Tipos de obstáculos
+        const obstacleTypes = ['🌲', '🪨', '🌳', '🌴', '🪵'];
+        
+        // Preguntas y respuestas
+        const questions = [
+            {
+                question: "¿A cuántos kilómetros está el Parque Nacional Perito Moreno de Gobernador Gregores (localidad más cercana)?",
+                answers: ["220 kilómetros", "160 kilómetros"],
+                correct: 0
+            }
+            // Puedes agregar más preguntas aquí
+        ];
+        
+        // Inicialización del juego
+        initGame();
+        
+        function initGame() {
+            updateDeerPosition();
+            createObstacle();
+            updateObstacles();
+            startQuestionTimer();
+        }
+        
+        // Temporizador para aparecer preguntas
+        function startQuestionTimer() {
+            // Aparece una pregunta cada 20-30 segundos
+            const nextQuestionTime = 10000 + Math.random() * 10000;
+            questionTimer = setTimeout(showQuestion, nextQuestionTime);
+        }
+        
+        // Mostrar pregunta
+        function showQuestion() {
+            if (!gameRunning || questionActive) return;
+            
+            questionActive = true;
+            pauseGame();
+            
+            // Seleccionar pregunta aleatoria
+            const currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            questionText.textContent = currentQuestion.question;
+            correctAnswer = currentQuestion.correct;
+            
+            // Mostrar pregunta y botones
+            questionContainer.style.display = 'block';
+            
+            // Posicionar botones aleatoriamente
+            function positionButtons() {
+    const questionRect = questionContainer.getBoundingClientRect();
+    const btnWidth = 200;
+    
+    // Posicionar botón 1 a la izquierda
+    answerBtn1.style.left = `${questionRect.left}px`;
+    answerBtn1.style.top = `${questionRect.bottom + 20}px`;
+    
+    // Posicionar botón 2 a la derecha
+    answerBtn2.style.left = `${questionRect.right - btnWidth}px`;
+    answerBtn2.style.top = `${questionRect.bottom + 20}px`;
+}
+            
+            // Asignar respuestas a los botones (mezcladas)
+            const shuffledAnswers = [...currentQuestion.answers].sort(() => Math.random() - 0.5);
+            answerBtn1.textContent = shuffledAnswers[0];
+            answerBtn2.textContent = shuffledAnswers[1];
+            
+            // Mostrar botones
+            answerBtn1.style.display = 'block';
+            answerBtn2.style.display = 'block';
+            
+            // Habilitar el cursor para poder hacer clic
+            document.body.style.cursor = 'auto';
+        }
+        
+        // Verificar si el ciervo está sobre un botón
+        function checkDeerOverButton() {
+            if (!questionActive) return;
+            
+            // Verificar botón 1
+            const btn1Rect = answerBtn1.getBoundingClientRect();
+            const overBtn1 = (
+                deerX > btn1Rect.left && 
+                deerX < btn1Rect.right && 
+                deerY > btn1Rect.top && 
+                deerY < btn1Rect.bottom
+            );
+            
+            // Verificar botón 2
+            const btn2Rect = answerBtn2.getBoundingClientRect();
+            const overBtn2 = (
+                deerX > btn2Rect.left && 
+                deerX < btn2Rect.right && 
+                deerY > btn2Rect.top && 
+                deerY < btn2Rect.bottom
+            );
+            
+            // Aplicar estilos
+            answerBtn1.classList.toggle('deer-over-btn', overBtn1);
+            answerBtn2.classList.toggle('deer-over-btn', overBtn2);
+        }
+        
+        // Manejar respuesta
+// Manejar respuesta
+function handleAnswer(btnIndex) {
+    if (!questionActive) return;
+    
+    if (btnIndex === correctAnswer) {
+        score += 50;
+        updateScore();
+    }
+    
+    // Ocultar pregunta y botones
+    questionContainer.style.display = 'none';
+    answerBtn1.style.display = 'none';
+    answerBtn2.style.display = 'none';
+    answerBtn1.classList.remove('deer-over-btn');
+    answerBtn2.classList.remove('deer-over-btn');
+    
+    // Restaurar cursor invisible
+    document.body.style.cursor = 'none';
+    
+    questionActive = false;
+    
+    // Reactivar el juego CORRECTAMENTE
+    gameRunning = true;
+    createObstacle(); // Reactivar la creación de obstáculos
+    updateObstacles(); // Reactivar el movimiento
+    
+    startQuestionTimer();
+}
+        
+        // Pausar el juego (para cuando aparece la pregunta)
+        function pauseGame() {
+            gameRunning = false;
+        }
+        
+        // Reanudar el juego
+        function resumeGame() {
+            gameRunning = true;
+            updateObstacles();
+        }
+
+            // Añadir esto para reanudar la creación de obstáculos:
+        if(!gameRunning) {
+        gameRunning = true;
+        createObstacle(); // <-- Esto reactiva el ciclo
+    }
+        
+        // Event listeners para los botones
+        answerBtn1.addEventListener('click', () => {
+            const isCorrect = answerBtn1.textContent === questions[0].answers[correctAnswer];
+            handleAnswer(isCorrect ? correctAnswer : 1 - correctAnswer);
+        });
+        
+        answerBtn2.addEventListener('click', () => {
+            const isCorrect = answerBtn2.textContent === questions[0].answers[correctAnswer];
+            handleAnswer(isCorrect ? correctAnswer : 1 - correctAnswer);
+        });
+        
+        // Movimiento del ciervo
+        document.addEventListener('mousemove', (e) => {
+            deerX = e.clientX;
+            deerY = e.clientY;
+            updateDeerPosition();
+            checkDeerOverButton();
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            deerX = e.touches[0].clientX;
+            deerY = e.touches[0].clientY;
+            updateDeerPosition();
+            checkDeerOverButton();
+        }, { passive: false });
+        
+        function updateDeerPosition() {
+            deer.style.left = `${deerX}px`;
+            deer.style.top = `${deerY}px`;
+        }
+        
+        function createObstacle() {
+            if (!gameRunning) return;
+            
+            const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+            const size = 30 + Math.random() * 30;
+            const x = Math.random() * (window.innerWidth - size);
+            
+            const obstacle = document.createElement('div');
+            obstacle.className = 'obstacle';
+            obstacle.textContent = type;
+            obstacle.style.fontSize = `${size}px`;
+            obstacle.style.left = `${x}px`;
+            obstacle.style.top = `-${size}px`;
+            document.body.appendChild(obstacle);
+            
+            obstacles.push({
+                element: obstacle,
+                x,
+                y: -size,
+                size,
+                speed: obstacleSpeed + Math.random() * 1
+            });
+            
+            setTimeout(createObstacle, obstacleSpawnRate);
+        }
+        
+        function updateScore() {
+            scoreElement.textContent = score;
+            scoreElement.classList.add('score-animation');
+            scoreCircle.classList.add('circle-animation');
+            
+            setTimeout(() => {
+                scoreElement.classList.remove('score-animation');
+                scoreCircle.classList.remove('circle-animation');
+            }, 500);
+        }
+        
+        function updateObstacles() {
+            if (!gameRunning) return;
+            
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obstacle = obstacles[i];
+                obstacle.y += obstacle.speed;
+                obstacle.element.style.top = `${obstacle.y}px`;
+                
+                if (obstacle.y > window.innerHeight) {
+                    document.body.removeChild(obstacle.element);
+                    obstacles.splice(i, 1);
+                    score++;
+                    updateScore();
+                    
+                    if (score % 5 === 0) {
+                        obstacleSpeed += 0.3;
+                        if (obstacleSpawnRate > 300) {
+                            obstacleSpawnRate -= 50;
+                        }
+                    }
+                }
+                
+                // Colisión con hitboxes reducidas
+                const collisionDistance = (deerSize/2 * 0.8) + (obstacle.size/2 * 0.6);
+                const actualDistance = Math.sqrt(
+                    Math.pow(deerX - (obstacle.x + obstacle.size/2), 2) + 
+                    Math.pow(deerY - (obstacle.y + obstacle.size/2), 2)
+                );
+                
+                if (actualDistance < collisionDistance) {
+                    gameOver();
+                }
+            }
+            
+            requestAnimationFrame(updateObstacles);
+        }
+        
+        function gameOver() {
+            gameRunning = false;
+            finalScoreElement.textContent = `Tu puntaje: ${score}`;
+            gameOverElement.style.display = 'block';
+            
+            // Eliminar todos los obstáculos
+            obstacles.forEach(obstacle => {
+                document.body.removeChild(obstacle.element);
+            });
+            obstacles = [];
+            
+            // Cancelar temporizador de preguntas
+            clearTimeout(questionTimer);
+            
+            // Ocultar pregunta si estaba activa
+            if (questionActive) {
+                questionContainer.style.display = 'none';
+                answerBtn1.style.display = 'none';
+                answerBtn2.style.display = 'none';
+                questionActive = false;
+                document.body.style.cursor = 'none';
+            }
+        }
+        
+        function resetGame() {
+            score = 0;
+            obstacleSpeed = 2;
+            obstacleSpawnRate = 1000;
+            gameRunning = true;
+            updateScore();
+            gameOverElement.style.display = 'none';
+            
+            // Restaurar cursor invisible
+            document.body.style.cursor = 'none';
+            
+            // Iniciar bucles del juego
+            createObstacle();
+            updateObstacles();
+            startQuestionTimer();
+        }
+        
+        // Redimensionamiento de ventana
+        window.addEventListener('resize', () => {
+            deerY = Math.min(deerY, window.innerHeight - 40);
+            updateDeerPosition();
+        });
+    </script>
+</body>
+</html>
