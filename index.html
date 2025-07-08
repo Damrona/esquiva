@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Full Screen Deer Dodge</title>
+    <title>El Ciervo Esquiva</title>
     <style>
         body {
             margin: 0;
@@ -241,6 +241,21 @@
     border: 3px solid #f1c40f;
     box-shadow: 0 0 15px #f1c40f;
 }
+
+/* Estilo para el emoji de correcto */
+.correct-emoji {
+    position: absolute;
+    font-size: 60px;
+    z-index: 1001;
+    pointer-events: none;
+    animation: fadeOut 1.5s forwards;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
     </style>
 </head>
 <body>
@@ -253,18 +268,13 @@
     <div id="ground"></div>
     
     <!-- Contenedor de pregunta -->
-<!-- Modifica esta parte -->
-<div id="questionContainer">
-    <div id="questionText"></div>
-    <div id="answersContainer">
-        <button id="answerBtn1" class="answer-btn"></button>
-        <button id="answerBtn2" class="answer-btn"></button>
+    <div id="questionContainer">
+        <div id="questionText"></div>
+        <div id="answersContainer">
+            <button id="answerBtn1" class="answer-btn"></button>
+            <button id="answerBtn2" class="answer-btn"></button>
+        </div>
     </div>
-</div>
-    
-    <!-- Botones de respuesta (posicionados dinámicamente) -->
-    <button id="answerBtn1" class="answer-btn"></button>
-    <button id="answerBtn2" class="answer-btn"></button>
     
     <div id="gameOver">
         <h2>Fin del juego!</h2>
@@ -301,84 +311,83 @@
         // Tipos de obstáculos
         const obstacleTypes = ['🌲', '🪨', '🌳', '🌴', '🪵'];
         
-const questions = [
-    {
-        question: "¿A cuántos kilómetros está el Parque Nacional Perito Moreno de Gobernador Gregores (localidad más cercana)?",
-        answers: ["220 kilómetros", "160 kilómetros"],
-        correct: 0
-    },
-    {
-        question: "¿Qué tipo de paisaje predomina en el Parque Nacional Perito Moreno?",
-        answers: ["Selva tropical y playas", "Estepa, lagunas, bosques y montañas"],
-        correct: 1
-    },
-    {
-        question: "¿Qué tipo de actividades están prohibidas en el Parque?",
-        answers: ["Encender fuego", "Hacer senderismo"],
-        correct: 0
-    },
-    {
-        question: "¿Qué servicio NO ofrece el Parque Nacional?",
-        answers: ["Red de senderos", "Proveeduría"],
-        correct: 1
-    },
-    {
-        question: "¿Qué sendero permite observar restos de la Pasarela Histórica?",
-        answers: ["Circuito Grande", "Sendero Río Volcán"],
-        correct: 1
-    },
-    {
-        question: "¿Cuántos días puede permanecer un visitante en un refugio?",
-        answers: ["Hasta una semana", "2 o 3 noches"],
-        correct: 1
-    },
-    {
-        question: "¿Qué tipo de animales pueden verse en el Parque?",
-        answers: ["Monos y tucanes", "Cóndores, choiques y huemules"],
-        correct: 1
-    },
-    {
-        question: "¿Qué aves en peligro de extinción pueden encontrarse en el parque?",
-        answers: ["Macá tobiano y chorlito ceniciento", "Colibrí gigante y flamenco andino"],
-        correct: 0
-    },
-    {
-        question: "¿Qué dificultad tiene el Circuito Azara?",
-        answers: ["Baja", "Alta"],
-        correct: 1
-    },
-    {
-        question: "¿Cómo se accede a los refugios del Parque?",
-        answers: ["Reservando por correo con una semana de anticipación", "Llegando sin aviso"],
-        correct: 0
-    },
-    {
-        question: "¿Cuál es el uso del Observatorio de aves Lagunas del Mié?",
-        answers: ["Hacer picnic y fogatas", "Observar aves sin molestarlas"],
-        correct: 1
-    },
-    {
-        question: "¿Qué recomendación se da antes de hacer senderismo?",
-        answers: ["Improvisar en el momento", "Planificar según tu experiencia física y llevar el equipo adecuado"],
-        correct: 1
-    },
-    {
-        question: "¿Qué dificultad tiene el ascenso al Cerro León?",
-        answers: ["Alta", "Baja"],
-        correct: 0
-    },
-    {
-        question: "¿Dónde se encuentra la Oficina de Informes ‘Ceferino Fonzo’?",
-        answers: ["En Gobernador Gregores", "En el Destacamento Onelli"],
-        correct: 1
-    },
-    {
-        question: "¿Cuál es el color característico del Lago Belgrano?",
-        answers: ["Blanco lechoso", "Verde esmeralda"],
-        correct: 0
-    }
-];
-
+        const questions = [
+            {
+                question: "¿A cuántos kilómetros está el Parque Nacional Perito Moreno de Gobernador Gregores (localidad más cercana)?",
+                answers: ["220 kilómetros", "160 kilómetros"],
+                correct: 0
+            },
+            {
+                question: "¿Qué tipo de paisaje predomina en el Parque Nacional Perito Moreno?",
+                answers: ["Selva tropical y playas", "Estepa, lagunas, bosques y montañas"],
+                correct: 1
+            },
+            {
+                question: "¿Qué tipo de actividades están prohibidas en el Parque?",
+                answers: ["Encender fuego", "Hacer senderismo"],
+                correct: 0
+            },
+            {
+                question: "¿Qué servicio NO ofrece el Parque Nacional?",
+                answers: ["Red de senderos", "Proveeduría"],
+                correct: 1
+            },
+            {
+                question: "¿Qué sendero permite observar restos de la Pasarela Histórica?",
+                answers: ["Circuito Grande", "Sendero Río Volcán"],
+                correct: 1
+            },
+            {
+                question: "¿Cuántos días puede permanecer un visitante en un refugio?",
+                answers: ["Hasta una semana", "2 o 3 noches"],
+                correct: 1
+            },
+            {
+                question: "¿Qué tipo de animales pueden verse en el Parque?",
+                answers: ["Monos y tucanes", "Cóndores, choiques y huemules"],
+                correct: 1
+            },
+            {
+                question: "¿Qué aves en peligro de extinción pueden encontrarse en el parque?",
+                answers: ["Macá tobiano y chorlito ceniciento", "Colibrí gigante y flamenco andino"],
+                correct: 0
+            },
+            {
+                question: "¿Qué dificultad tiene el Circuito Azara?",
+                answers: ["Baja", "Alta"],
+                correct: 1
+            },
+            {
+                question: "¿Cómo se accede a los refugios del Parque?",
+                answers: ["Reservando por correo con una semana de anticipación", "Llegando sin aviso"],
+                correct: 0
+            },
+            {
+                question: "¿Cuál es el uso del Observatorio de aves Lagunas del Mié?",
+                answers: ["Hacer picnic y fogatas", "Observar aves sin molestarlas"],
+                correct: 1
+            },
+            {
+                question: "¿Qué recomendación se da antes de hacer senderismo?",
+                answers: ["Improvisar en el momento", "Planificar según tu experiencia física y llevar el equipo adecuado"],
+                correct: 1
+            },
+            {
+                question: "¿Qué dificultad tiene el ascenso al Cerro León?",
+                answers: ["Alta", "Baja"],
+                correct: 0
+            },
+            {
+                question: "¿Dónde se encuentra la Oficina de Informes 'Ceferino Fonzo'?",
+                answers: ["En Gobernador Gregores", "En el Destacamento Onelli"],
+                correct: 1
+            },
+            {
+                question: "¿Cuál es el color característico del Lago Belgrano?",
+                answers: ["Blanco lechoso", "Verde esmeralda"],
+                correct: 0
+            }
+        ];
         
         // Inicialización del juego
         initGame();
@@ -411,20 +420,6 @@ const questions = [
             
             // Mostrar pregunta y botones
             questionContainer.style.display = 'block';
-            
-            // Posicionar botones aleatoriamente
-            function positionButtons() {
-    const questionRect = questionContainer.getBoundingClientRect();
-    const btnWidth = 200;
-    
-    // Posicionar botón 1 a la izquierda
-    answerBtn1.style.left = `${questionRect.left}px`;
-    answerBtn1.style.top = `${questionRect.bottom + 20}px`;
-    
-    // Posicionar botón 2 a la derecha
-    answerBtn2.style.left = `${questionRect.right - btnWidth}px`;
-    answerBtn2.style.top = `${questionRect.bottom + 20}px`;
-}
             
             // Asignar respuestas a los botones (mezcladas)
             const shuffledAnswers = [...currentQuestion.answers].sort(() => Math.random() - 0.5);
@@ -466,61 +461,83 @@ const questions = [
             answerBtn2.classList.toggle('deer-over-btn', overBtn2);
         }
         
+        // Mostrar emoji de correcto
+        function showCorrectEmoji() {
+            const emoji = document.createElement('div');
+            emoji.className = 'correct-emoji';
+            emoji.textContent = '✅';
+            emoji.style.left = `${deerX}px`;
+            emoji.style.top = `${deerY}px`;
+            document.body.appendChild(emoji);
+            
+            // Eliminar el emoji después de la animación
+            setTimeout(() => {
+                document.body.removeChild(emoji);
+            }, 1500);
+        }
+        
         // Manejar respuesta
-// Manejar respuesta
-function handleAnswer(btnIndex) {
-    if (!questionActive) return;
-    
-    if (btnIndex === correctAnswer) {
-        score += 50;
-        updateScore();
-    }
-    
-    // Ocultar pregunta y botones
-    questionContainer.style.display = 'none';
-    answerBtn1.style.display = 'none';
-    answerBtn2.style.display = 'none';
-    answerBtn1.classList.remove('deer-over-btn');
-    answerBtn2.classList.remove('deer-over-btn');
-    
-    // Restaurar cursor invisible
-    document.body.style.cursor = 'none';
-    
-    questionActive = false;
-    
-    // Reactivar el juego CORRECTAMENTE
-    gameRunning = true;
-    createObstacle(); // Reactivar la creación de obstáculos
-    updateObstacles(); // Reactivar el movimiento
-    
-    startQuestionTimer();
-}
+        function handleAnswer(btnIndex) {
+            if (!questionActive) return;
+            
+            // Obtener el botón clickeado
+            const clickedBtn = btnIndex === 0 ? answerBtn1 : answerBtn2;
+            
+            if (btnIndex === correctAnswer) {
+                // Respuesta correcta
+                score += 50;
+                updateScore();
+                showCorrectEmoji();
+                
+                // Efecto visual para el botón correcto
+                clickedBtn.style.backgroundColor = '#4CAF50';
+                setTimeout(() => {
+                    clickedBtn.style.backgroundColor = '';
+                }, 500);
+            } else {
+                // Respuesta incorrecta - aumentar velocidad de obstáculos
+                obstacleSpeed += 0.5;
+                
+                // Efecto visual para el botón incorrecto
+                clickedBtn.style.backgroundColor = '#f44336';
+                setTimeout(() => {
+                    clickedBtn.style.backgroundColor = '';
+                }, 500);
+            }
+            
+            // Ocultar pregunta y botones
+            questionContainer.style.display = 'none';
+            answerBtn1.style.display = 'none';
+            answerBtn2.style.display = 'none';
+            answerBtn1.classList.remove('deer-over-btn');
+            answerBtn2.classList.remove('deer-over-btn');
+            
+            // Restaurar cursor invisible
+            document.body.style.cursor = 'none';
+            
+            questionActive = false;
+            
+            // Reactivar el juego
+            gameRunning = true;
+            createObstacle();
+            updateObstacles();
+            
+            startQuestionTimer();
+        }
         
         // Pausar el juego (para cuando aparece la pregunta)
         function pauseGame() {
             gameRunning = false;
         }
         
-        // Reanudar el juego
-        function resumeGame() {
-            gameRunning = true;
-            updateObstacles();
-        }
-
-            // Añadir esto para reanudar la creación de obstáculos:
-        if(!gameRunning) {
-        gameRunning = true;
-        createObstacle(); // <-- Esto reactiva el ciclo
-    }
-        
         // Event listeners para los botones
         answerBtn1.addEventListener('click', () => {
-            const isCorrect = answerBtn1.textContent === questions[0].answers[correctAnswer];
+            const isCorrect = answerBtn1.textContent === questions.find(q => q.question === questionText.textContent).answers[correctAnswer];
             handleAnswer(isCorrect ? correctAnswer : 1 - correctAnswer);
         });
         
         answerBtn2.addEventListener('click', () => {
-            const isCorrect = answerBtn2.textContent === questions[0].answers[correctAnswer];
+            const isCorrect = answerBtn2.textContent === questions.find(q => q.question === questionText.textContent).answers[correctAnswer];
             handleAnswer(isCorrect ? correctAnswer : 1 - correctAnswer);
         });
         
